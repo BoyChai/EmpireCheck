@@ -1,0 +1,4 @@
+es:
+  URL: "http://localhost:9200"
+ocr:
+  URL: "http://127.0.0.1:1224"

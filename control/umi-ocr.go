@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 type requestStruct struct {
@@ -73,7 +75,7 @@ func UmiOcr(base64 string) ([]Lord, error) {
 	}
 
 	// 发送POST请求
-	resp, err := http.Post("http://127.0.0.1:1224/api/ocr", "application/json", bytes.NewBuffer(jsonData))
+	resp, err := http.Post(viper.GetString("ocr.URL")+"/api/ocr", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println("Error sending POST request:", err)
 		return nil, errors.New("Error sending POST request")
