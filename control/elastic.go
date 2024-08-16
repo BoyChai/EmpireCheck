@@ -2,6 +2,7 @@ package control
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -87,5 +88,28 @@ func ESControl(data []Lord) {
 		}
 		fmt.Printf("%#v\n", indexResponse)
 	}
+
+}
+
+func EsFind() []LordModel {
+	quer := elastic.NewBoolQuery()
+	res, err := ESClient.Search(LordModel{}.Index()).Query(quer).From(0).Size(200).Do(context.Background())
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	count := res.Hits.TotalHits.Value
+	fmt.Println(count)
+	var lordList []LordModel
+	for _, v := range res.Hits.Hits {
+		var lord LordModel
+		err := json.Unmarshal(v.Source, &lord)
+		if err != nil {
+			fmt.Println("Error unmarshalling document:", err)
+			continue
+		}
+		lordList = append(lordList, lord)
+	}
+	return lordList
 
 }
