@@ -42,7 +42,7 @@ type Lord struct {
 	// 主公名字
 	Name string `json:"name"`
 	// 主公职业
-	Career string `json:career`
+	Career string `json:"career"`
 	// 主公职位
 	Position string `json:"position"`
 	// 总繁荣
@@ -88,7 +88,6 @@ func UmiOcr(base64 string) ([]Lord, error) {
 		fmt.Println("Error reading response body:", err)
 		return nil, errors.New("Error reading response body")
 	}
-
 	// 解析响应数据
 	var response responseStruct
 	if err := json.Unmarshal(body, &response); err != nil {
@@ -96,19 +95,29 @@ func UmiOcr(base64 string) ([]Lord, error) {
 		return nil, errors.New("Error decoding JSON response")
 
 	}
+	fmt.Println(response)
 	var lordList []Lord
-	for i, v := range response.Data[3 : len(response.Data)-1] {
-		if i%2 == 0 {
-			fields := strings.Fields(v.Text)
-			lordList = append(lordList, Lord{
-				Name:                fields[0],
-				Career:              fields[1],
-				Position:            fields[2],
-				Prosperous:          fields[3],
-				WeekMilitaryExploit: fields[4],
-				WeekContribute:      fields[5],
-			})
+	// for i, v := range response.Data[3 : len(response.Data)-1] {
+	// for i, v := range response.Data[3:] {
+	for _, v := range response.Data[3:] {
+		// if i%2 == 0 {
+		fields := strings.Fields(v.Text)
+
+		if len(fields) < 6 {
+			continue
 		}
+		fmt.Println(fields[0])
+		lordList = append(lordList, Lord{
+			Name:   fields[0],
+			Career: fields[1][len(fields[1])-6:],
+			// Career:              fields[1],
+			Position:            fields[2],
+			Prosperous:          fields[3],
+			WeekMilitaryExploit: fields[4],
+			WeekContribute:      fields[5],
+		})
+
+		// }
 	}
 	// 输出
 	jsonData, err = json.Marshal(lordList)
